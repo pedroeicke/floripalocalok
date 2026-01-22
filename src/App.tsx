@@ -53,7 +53,7 @@ const App = () => {
             <Route path="/painel" element={<UserDashboard />} />
             <Route path="/meus-anuncios" element={<UserDashboard />} />
             <Route path="/publicar-anuncio" element={<PostAdPage />} />
-            <Route path="/anuncio/:id/promover" element={<PromoteAdPage />} />
+            {/* <Route path="/anuncio/:id/promover" element={<PromoteAdPage />} /> */}
             <Route path="/anuncio/:id/editar" element={<EditAdPage />} />
             <Route path="/ajuda" element={<HelpPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

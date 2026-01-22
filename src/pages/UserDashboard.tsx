@@ -347,7 +347,7 @@ const MyAdsTab = ({ ads, onUpdate }: { ads: Listing[], onUpdate: () => void }) =
                                 </div>
                             </div>
 
-                            {/* Right Section: Promote */}
+                            {/* Right Section: Promote (Disabled for now)
                             <div className="w-full md:w-[320px] bg-gray-50 p-6 flex flex-col items-center justify-center text-center border-l border-gray-100">
                                 <p className="text-xs text-gray-500 mb-3">Você não tem planos ativos.</p>
                                 <Link 
@@ -357,6 +357,7 @@ const MyAdsTab = ({ ads, onUpdate }: { ads: Listing[], onUpdate: () => void }) =
                                     Adicione um plano de destaque
                                 </Link>
                             </div>
+                            */}
                         </div>
                     ))
                 )}

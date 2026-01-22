@@ -71,7 +71,15 @@ export default function PromoteAdPage() {
             type: 'checkbox',
             icon: <Star className="w-10 h-10 text-orange-400" />
         },
-
+        {
+            id: 'highlight',
+            title: 'Coloque cor em seu anúncio',
+            description: 'Seu anúncio aparece colorido de verde',
+            price: 59.95,
+            duration: '30 dias',
+            type: 'checkbox',
+            icon: <Palette className="w-10 h-10 text-green-500" />
+        },
         {
             id: 'top_bump',
             title: 'Suba o seu anúncio / Ir para o topo',
