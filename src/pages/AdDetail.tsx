@@ -3,7 +3,7 @@ import { Footer } from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getListingById } from "@/services/listings";
+import { getListingById, incrementListingView, incrementListingClick } from "@/services/listings";
 import { createConversation, sendMessage } from "@/services/messages";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
@@ -46,6 +46,13 @@ export default function AdDetail() {
         queryFn: () => getListingById(id || ""),
         enabled: !!id
     });
+
+    useEffect(() => {
+        if (id) {
+            // Increment view count on load (once per mount)
+            incrementListingView(id);
+        }
+    }, [id]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -220,6 +227,7 @@ export default function AdDetail() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (ad.profiles?.phone) {
+                                    incrementListingClick(ad.id, 'whatsapp'); // Track phone click as whatsapp/contact
                                     window.location.href = `tel:${ad.profiles.phone}`;
                                     const btn = document.getElementById('sticky-phone-btn');
                                     if (btn) btn.innerText = ad.profiles.phone;
@@ -533,7 +541,7 @@ export default function AdDetail() {
                                     Usuário desde <span className="font-normal">{ad.profiles?.created_at ? new Date(ad.profiles.created_at).toLocaleDateString() : new Date().toLocaleDateString()}</span>
                                 </div>
                                 <div className="font-bold">
-                                    Visitas <span className="font-normal">18</span>
+                                    Visitas <span className="font-normal">{ad.analytics?.views || 0}</span>
                                 </div>
                             </div>
                         </div>
@@ -603,6 +611,7 @@ export default function AdDetail() {
                                     <button 
                                         onClick={() => {
                                             if (ad.profiles?.phone) {
+                                                incrementListingClick(ad.id, 'whatsapp');
                                                 window.open(`https://wa.me/55${ad.profiles.phone.replace(/\D/g, '')}`, '_blank');
                                             } else {
                                                 alert("WhatsApp não disponível");

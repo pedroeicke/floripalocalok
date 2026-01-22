@@ -26,6 +26,11 @@ export interface Listing {
     attributes: Record<string, any>;
     images: string[];
     created_at: string;
+    analytics?: {
+        views?: number;
+        whatsapp_clicks?: number;
+        email_clicks?: number;
+    };
     profiles?: Profile; // Joined
 }
 

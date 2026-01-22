@@ -208,3 +208,41 @@ export async function getFavoriteListings(): Promise<Listing[]> {
     // @ts-ignore
     return data?.map(item => item.listing).filter(Boolean) || [];
 }
+
+export async function incrementListingView(id: string) {
+    // Try RPC first if available (safer for concurrency)
+    const { error } = await supabase.rpc('increment_listing_counter', {
+        listing_id: id,
+        counter_type: 'view'
+    });
+
+    if (error) {
+        console.warn("RPC increment_listing_counter failed, falling back.", error);
+        // Fallback for JSONB update without RPC is hard to do atomically client-side without risk
+        // We will just read-modify-write
+        const { data } = await supabase.from('listings').select('analytics').eq('id', id).single();
+        const analytics = data?.analytics || {};
+        const views = (analytics.views || 0) + 1;
+        await supabase.from('listings').update({ 
+            analytics: { ...analytics, views } 
+        }).eq('id', id);
+    }
+}
+
+export async function incrementListingClick(id: string, type: 'whatsapp' | 'email') {
+    const { error } = await supabase.rpc('increment_listing_counter', {
+        listing_id: id,
+        counter_type: type
+    });
+
+    if (error) {
+         console.warn("RPC increment_listing_counter failed, falling back.", error);
+         const key = type === 'whatsapp' ? 'whatsapp_clicks' : 'email_clicks';
+         const { data } = await supabase.from('listings').select('analytics').eq('id', id).single();
+         const analytics = data?.analytics || {};
+         const current = (analytics[key] || 0) + 1;
+         await supabase.from('listings').update({ 
+            analytics: { ...analytics, [key]: current } 
+         }).eq('id', id);
+    }
+}

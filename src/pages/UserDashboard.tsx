@@ -9,9 +9,8 @@ import { Listing, Conversation, Message, Profile } from "@/types";
 import { toast } from "sonner";
 import { getMyListings, updateListing, getFavoriteListings, toggleFavorite } from "@/services/listings";
 import { getMyConversations, getMessages, sendMessage } from "@/services/messages";
-import { Eye, Edit, Mail, Phone } from "lucide-react";
+import { Eye, Edit, Mail, Phone, ExternalLink } from "lucide-react";
 
-// Mock Data Types
 type Tab = 'overview' | 'ads' | 'chat' | 'favorites' | 'settings';
 
 export default function UserDashboard() {
@@ -271,7 +270,13 @@ const OverviewTab = ({ setActiveTab, adsCount, conversationsCount }: { setActive
 );
 
 const MyAdsTab = ({ ads, onUpdate }: { ads: Listing[], onUpdate: () => void }) => {
+    // We need conversations to count messages for each ad
+    const [conversations, setConversations] = useState<Conversation[]>([]);
     
+    useEffect(() => {
+        getMyConversations().then(setConversations).catch(console.error);
+    }, []);
+
     const toggleStatus = async (ad: Listing) => {
         const newStatus = ad.status === 'active' ? 'inactive' : 'active';
         try {
@@ -310,23 +315,23 @@ const MyAdsTab = ({ ads, onUpdate }: { ads: Listing[], onUpdate: () => void }) =
                                         <span className="font-bold text-gray-700 text-sm">
                                             {ad.status === 'active' ? 'Publicado' : (ad.status === 'draft' ? 'Rascunho' : 'Pausado')}
                                         </span>
-                                        <span className="text-xs text-gray-400">Expira em 29/01/26</span>
+                                        {/* <span className="text-xs text-gray-400">Expira em 29/01/26</span> */}
                                     </div>
                                     
                                     <div className="text-xs text-gray-400 mb-2">ID do anúncio: {ad.id.slice(0, 8)}...</div>
                                     
                                     <h3 className="font-bold text-gray-900 text-lg mb-2 truncate">{ad.title}</h3>
                                     
-                                    {/* Stats Mock */}
+                                    {/* Stats Real */}
                                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600">
-                                            <Eye className="w-4 h-4" /> 117
+                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600" title="Visualizações">
+                                            <Eye className="w-4 h-4" /> {ad.analytics?.views || 0}
                                         </div>
-                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600">
-                                            <Mail className="w-4 h-4" /> 1
+                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600" title="Mensagens (Chat)">
+                                            <Mail className="w-4 h-4" /> {conversations.filter(c => c.listing_id === ad.id).length}
                                         </div>
-                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600">
-                                            <Phone className="w-4 h-4" /> 2
+                                        <div className="flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-blue-600" title="Cliques no WhatsApp/Telefone">
+                                            <Phone className="w-4 h-4" /> {ad.analytics?.whatsapp_clicks || 0}
                                         </div>
                                     </div>
 
@@ -337,6 +342,14 @@ const MyAdsTab = ({ ads, onUpdate }: { ads: Listing[], onUpdate: () => void }) =
                                 </div>
                                 
                                 <div className="flex flex-col gap-2 justify-start">
+                                    <Link
+                                        to={`/anuncio/${ad.id}`}
+                                        target="_blank"
+                                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                                        title="Ver Anúncio"
+                                    >
+                                        <ExternalLink className="w-5 h-5" />
+                                    </Link>
                                     <Link
                                         to={`/anuncio/${ad.id}/editar`}
                                         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
